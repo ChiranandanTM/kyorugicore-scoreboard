@@ -1,0 +1,22 @@
+{
+    "name": "Taekwondo Scoreboard",
+    "short_name": "TKD Scoreboard",
+    "description": "A scoreboard for Taekwondo matches",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#fefefe",
+    "theme_color": "#3498db",
+    "scope": "./",
+    "icons": [
+        {
+            "src": "./icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "./icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
