@@ -344,12 +344,6 @@ export const useMatchStore = create((set, get) => ({
         roundStats: newStats,
       }).catch(console.error)
       push(ref(db, `rooms/${currentRoomId}/currentMatchLog`), logEntry).catch(console.error)
-      if (voters.length > 0) {
-        dbSet(ref(db, `rooms/${currentRoomId}/lastAwardedReferees`), {
-          ids: voters.map(v => v.refereeId),
-          timestamp: Date.now(),
-        }).catch(console.error)
-      }
     }
     get().checkPointGap()
     get().checkGamJeomLimit()
