@@ -688,7 +688,7 @@ html, body {
   background-color: black;
   background-size: cover;
   background-position: center;
-  background-image: url('/images/ChatGPT Image Jun 14, 2026, 02_00_50 AM.png');
+  background-image: url('/images/ChatGPT Image Jun 14, 2026, 11_11_15 PM.png');
   color: white;
   display: flex;
   flex-direction: column;
@@ -768,6 +768,18 @@ html, body {
 }
 
 .delete-referee:hover { background: #cc0000; }
+
+.save-referee {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+.save-referee:hover { background: #1e7e34; }
 
 /* Blink animations */
 .blink-white {
