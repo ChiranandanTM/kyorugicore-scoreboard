@@ -685,77 +685,192 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: black;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.82) 100%),
+    url('/taekwondo-background.jpg') no-repeat center center;
   background-size: cover;
-  background-position: center;
-  background-image: url('/images/background.png');
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  padding: 2em;
-  text-align: center;
   font-family: 'Arial', sans-serif;
+  overflow-y: auto;
+  padding: 20px;
 }
 
-.referee-login-overlay h1 {
-  font-size: 2.5em;
-  margin-bottom: 1em;
+/* Glassmorphism card */
+.rlm-card {
+  background: rgba(8, 10, 28, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 44px 40px 36px;
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  box-shadow:
+    0 0 0 1px rgba(255, 5, 5, 0.15),
+    0 0 60px rgba(255, 5, 5, 0.2),
+    0 0 100px rgba(5, 17, 252, 0.12),
+    0 30px 60px rgba(0, 0, 0, 0.55);
+}
+
+.rlm-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 22px 22px 0 0;
+  background: linear-gradient(90deg, #ff0505 0%, #ffffff 50%, #0511fc 100%);
+}
+
+.rlm-brand {
+  font-size: 0.68em;
+  font-weight: 800;
+  letter-spacing: 5px;
   text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 10px;
 }
 
-.referee-login-overlay button {
-  margin: 8px;
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
+.rlm-title {
+  font-size: 1.7em;
+  font-weight: 800;
+  margin: 0 0 24px;
+  text-align: center;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px rgba(255, 5, 5, 0.4);
+}
+
+.rlm-btn-create {
+  width: 100%;
+  padding: 14px;
   font-size: 1em;
-}
-
-.referee-login-overlay canvas {
-  margin-top: 1em;
-  border: 2px solid white;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(255,255,255,0.2);
-}
-
-.referee-login-overlay .exit-button {
-  margin-top: 2em;
-  background: linear-gradient(45deg, #ff0000, #ff4d4d);
-  color: white;
-  padding: 12px 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #e00000 0%, #ff0505 50%, #cc0000 100%);
+  color: #fff;
   cursor: pointer;
-  font-size: 1.1em;
-  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(255, 5, 5, 0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-.referee-login-overlay .exit-button:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(255,0,0,0.3);
+.rlm-btn-create:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(255, 5, 5, 0.55);
+}
+
+.rlm-room-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.rlm-room-id {
+  font-size: 1em;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.rlm-room-id strong {
+  color: #fff;
+  font-size: 1.1em;
+  letter-spacing: 3px;
+}
+
+.rlm-qr-wrap canvas {
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.rlm-referee-list {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.rlm-ref-heading {
+  font-size: 0.9em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rlm-ref-count {
+  background: rgba(255,5,5,0.25);
+  border: 1px solid rgba(255,5,5,0.4);
+  color: #ff6b6b;
+  border-radius: 20px;
+  padding: 1px 9px;
+  font-size: 0.9em;
+}
+
+.rlm-btn-exit {
+  width: 100%;
+  padding: 13px;
+  font-size: 0.95em;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.rlm-btn-exit:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+  color: #fff;
 }
 
 /* Referee list in login panel */
 .referee-entry {
   display: flex;
   align-items: center;
-  margin: 10px 0;
-  gap: 10px;
+  margin: 8px 0;
+  gap: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 8px 10px;
 }
 
-.referee-id { min-width: 100px; font-weight: bold; }
+.referee-id {
+  min-width: 90px;
+  font-weight: 700;
+  font-size: 0.85em;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.5px;
+}
 
 .rename-input {
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  color: #000;
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
 }
 
 .delete-referee {
