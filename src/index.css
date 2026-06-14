@@ -685,192 +685,77 @@ html, body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background:
-    radial-gradient(ellipse at 50% 40%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.82) 100%),
-    url('/images/background.png') no-repeat center center;
+  background-color: black;
   background-size: cover;
+  background-position: center;
+  background-image: url('/images/background.png');
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  font-family: 'Arial', sans-serif;
-  overflow-y: auto;
-  padding: 20px;
-}
-
-/* Glassmorphism card */
-.rlm-card {
-  background: rgba(8, 10, 28, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 44px 40px 36px;
-  width: 100%;
-  max-width: 460px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  box-shadow:
-    0 0 0 1px rgba(255, 5, 5, 0.15),
-    0 0 60px rgba(255, 5, 5, 0.2),
-    0 0 100px rgba(5, 17, 252, 0.12),
-    0 30px 60px rgba(0, 0, 0, 0.55);
-}
-
-.rlm-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  border-radius: 22px 22px 0 0;
-  background: linear-gradient(90deg, #ff0505 0%, #ffffff 50%, #0511fc 100%);
-}
-
-.rlm-brand {
-  font-size: 0.68em;
-  font-weight: 800;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 10px;
-}
-
-.rlm-title {
-  font-size: 1.7em;
-  font-weight: 800;
-  margin: 0 0 24px;
+  padding: 2em;
   text-align: center;
-  letter-spacing: 1px;
+  font-family: 'Arial', sans-serif;
+}
+
+.referee-login-overlay h1 {
+  font-size: 2.5em;
+  margin-bottom: 1em;
   text-transform: uppercase;
-  text-shadow: 0 2px 12px rgba(255, 5, 5, 0.4);
-}
-
-.rlm-btn-create {
-  width: 100%;
-  padding: 14px;
-  font-size: 1em;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #e00000 0%, #ff0505 50%, #cc0000 100%);
-  color: #fff;
-  cursor: pointer;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(255, 5, 5, 0.4);
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.rlm-btn-create:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(255, 5, 5, 0.55);
-}
-
-.rlm-room-info {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.rlm-room-id {
-  font-size: 1em;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 10px;
-  letter-spacing: 1px;
-}
-
-.rlm-room-id strong {
-  color: #fff;
-  font-size: 1.1em;
-  letter-spacing: 3px;
-}
-
-.rlm-qr-wrap canvas {
-  border: 2px solid rgba(255,255,255,0.2);
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-}
-
-.rlm-referee-list {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.rlm-ref-heading {
-  font-size: 0.9em;
-  font-weight: 700;
   letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.5);
-  margin: 0 0 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
-.rlm-ref-count {
-  background: rgba(255,5,5,0.25);
-  border: 1px solid rgba(255,5,5,0.4);
-  color: #ff6b6b;
-  border-radius: 20px;
-  padding: 1px 9px;
-  font-size: 0.9em;
-}
-
-.rlm-btn-exit {
-  width: 100%;
-  padding: 13px;
-  font-size: 0.95em;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
+.referee-login-overlay button {
+  margin: 8px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  font-size: 1em;
 }
 
-.rlm-btn-exit:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: #fff;
+.referee-login-overlay canvas {
+  margin-top: 1em;
+  border: 2px solid white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(255,255,255,0.2);
+}
+
+.referee-login-overlay .exit-button {
+  margin-top: 2em;
+  background: linear-gradient(45deg, #ff0000, #ff4d4d);
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1em;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.referee-login-overlay .exit-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(255,0,0,0.3);
 }
 
 /* Referee list in login panel */
 .referee-entry {
   display: flex;
   align-items: center;
-  margin: 8px 0;
-  gap: 8px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 10px;
-  padding: 8px 10px;
+  margin: 10px 0;
+  gap: 10px;
 }
 
-.referee-id {
-  min-width: 90px;
-  font-weight: 700;
-  font-size: 0.85em;
-  color: rgba(255,255,255,0.6);
-  letter-spacing: 0.5px;
-}
+.referee-id { min-width: 100px; font-weight: bold; }
 
 .rename-input {
-  flex: 1;
-  padding: 7px 10px;
-  border-radius: 7px;
-  border: 1.5px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.08);
-  color: #fff;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  color: #000;
 }
 
 .delete-referee {
@@ -1083,174 +968,41 @@ html, body {
 
 /* Referee app styles */
 .referee-page {
-  width: 100vw;
-  height: 100vh;
-  background:
-    radial-gradient(ellipse at 50% 40%, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.82) 100%),
-    url('/images/background.png') no-repeat center center;
-  background-size: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  min-height: 100vh;
+  background: #1a1a2e;
   color: white;
   font-family: Arial, sans-serif;
 }
 
-.room-entry {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-/* Glassmorphism login card */
-.ref-login-card {
-  background: rgba(8, 10, 28, 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 48px 36px 40px;
-  width: 90%;
-  max-width: 380px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  box-shadow:
-    0 0 0 1px rgba(255, 5, 5, 0.15),
-    0 0 60px rgba(255, 5, 5, 0.2),
-    0 0 100px rgba(5, 17, 252, 0.12),
-    0 30px 60px rgba(0, 0, 0, 0.55);
-}
-
-.ref-login-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  border-radius: 22px 22px 0 0;
-  background: linear-gradient(90deg, #ff0505 0%, #ffffff 50%, #0511fc 100%);
-}
-
-.ref-login-brand {
-  font-size: 0.7em;
-  font-weight: 800;
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 14px;
-}
-
-.ref-login-card h1 {
-  font-size: 2em;
-  font-weight: 800;
-  margin: 0 0 6px;
-  text-align: center;
-  letter-spacing: -0.5px;
-  text-shadow: 0 2px 12px rgba(255, 5, 5, 0.5);
-}
-
-.ref-login-sub {
-  font-size: 0.85em;
-  color: rgba(255, 255, 255, 0.45);
-  margin: 0 0 28px;
+#roomEntry, .room-entry {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
   text-align: center;
 }
 
-.room-entry input {
-  padding: 14px 16px;
-  font-size: 1.05em;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-align: center;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+#roomEntry input, .room-entry input {
   width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 14px;
-  outline: none;
-  transition: border-color 0.25s, background 0.25s;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
-.room-entry input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
-  letter-spacing: 1px;
-  font-weight: 400;
-}
-
-.room-entry input:focus {
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.13);
-}
-
-.ref-btn-join {
+#roomEntry button, .room-entry button {
   width: 100%;
-  padding: 15px;
-  font-size: 1em;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  padding: 10px;
+  margin: 10px 0;
+  background: #007bff;
+  color: white;
   border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #e00000 0%, #ff0505 50%, #cc0000 100%);
-  color: #fff;
+  border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 20px rgba(255, 5, 5, 0.45);
-  transition: transform 0.15s, box-shadow 0.15s;
+  font-size: 16px;
 }
 
-.ref-btn-join:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 28px rgba(255, 5, 5, 0.6);
-}
-
-.ref-btn-join:active { transform: translateY(0); }
-
-.ref-btn-scan {
-  width: 100%;
-  padding: 14px;
-  font-size: 0.95em;
-  font-weight: 600;
-  border: 1.5px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.75);
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-}
-
-.ref-btn-scan:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: #fff;
-}
-
-.ref-btn-stop {
-  width: 100%;
-  padding: 14px;
-  font-size: 0.95em;
-  font-weight: 600;
-  border: 1.5px solid rgba(220, 53, 69, 0.5);
-  border-radius: 10px;
-  background: rgba(220, 53, 69, 0.15);
-  color: #ff6b6b;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.ref-btn-stop:hover { background: rgba(220, 53, 69, 0.25); }
-
-.ref-error {
-  color: #ff6b6b;
-  font-size: 0.85em;
-  margin-top: 10px;
-  text-align: center;
-}
+#roomEntry button:hover, .room-entry button:hover { background: #0056b3; }
 
 #qr-reader { margin: 20px auto; max-width: 300px; }
 
