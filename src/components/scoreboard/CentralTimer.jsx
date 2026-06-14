@@ -44,7 +44,7 @@ export default function CentralTimer() {
 
       {store.matchWinnerDeclared && (
         <div style={{
-          fontSize: 'clamp(18px, 2.6vw, 38px)', fontWeight: 'bold', color: '#c0392b',
+          fontSize: 36, fontWeight: 'bold', color: '#c0392b',
           letterSpacing: 2, textTransform: 'uppercase', margin: '4px 0'
         }}>
           Ended
