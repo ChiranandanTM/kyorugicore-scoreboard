@@ -85,22 +85,30 @@ export default function RoomEntry({ refereeId, onJoined }) {
 
   return (
     <div className="room-entry">
-      <h1 style={{ color: 'white', marginBottom: '20px' }}>Referee Login</h1>
-      <input
-        type="text"
-        placeholder="Enter Room Code"
-        value={roomCode}
-        onChange={e => setRoomCode(e.target.value.toUpperCase())}
-        onKeyDown={e => e.key === 'Enter' && joinRoom()}
-      />
-      <button onClick={() => joinRoom()}>Join Room</button>
-      {!scanning ? (
-        <button onClick={startScan} style={{ background: '#6c757d' }}>Scan QR Code</button>
-      ) : (
-        <button onClick={stopScan} style={{ background: '#dc3545' }}>Stop Scanning</button>
-      )}
+      <div className="ref-login-card">
+        <div className="ref-login-brand">KYORUGI CORE</div>
+        <h1>Referee Login</h1>
+        <p className="ref-login-sub">Enter your room code to join</p>
+
+        <input
+          type="text"
+          placeholder="Enter Room Code"
+          value={roomCode}
+          onChange={e => setRoomCode(e.target.value.toUpperCase())}
+          onKeyDown={e => e.key === 'Enter' && joinRoom()}
+        />
+        <button className="ref-btn-join" onClick={() => joinRoom()}>Join Room</button>
+        {!scanning ? (
+          <button className="ref-btn-scan" onClick={startScan}>
+            <span>&#x1F4F7;</span> Scan QR Code
+          </button>
+        ) : (
+          <button className="ref-btn-stop" onClick={stopScan}>Stop Scanning</button>
+        )}
+        {error && <p className="ref-error">{error}</p>}
+      </div>
+
       {scanning && <div id="qr-reader" ref={qrReaderRef} />}
-      {error && <p style={{ color: '#ff6b6b', marginTop: '10px' }}>{error}</p>}
     </div>
   )
 }
