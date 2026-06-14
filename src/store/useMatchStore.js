@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS = {
 let timerInterval = null
 let breakInterval = null
 let currentlyPlaying = null
+let isValidating = false
 
 function getActionImageUrl(action, points) {
   switch (action) {
@@ -170,6 +171,8 @@ export const useMatchStore = create((set, get) => ({
       ? Object.values(data.currentMatchLog).sort((a, b) => a.timestamp - b.timestamp)
       : state.matchLog
 
+    const newReferees = data.referees != null ? data.referees : state.referees
+
     set({
       hongScore: newHong,
       chongScore: newChong,
@@ -187,6 +190,7 @@ export const useMatchStore = create((set, get) => ({
       chongLastPressedAction: newChongPressed,
       roundStats: newRoundStats,
       matchLog: newMatchLog,
+      referees: newReferees,
     })
 
     // Sync timer running state across clients
@@ -216,8 +220,11 @@ export const useMatchStore = create((set, get) => ({
   },
 
   // ── Submissions validation ────────────────────────────────────────
-  validateSubmissions: (roomId) => {
-    dbGet(ref(db, `rooms/${roomId}`)).then(snap => {
+  validateSubmissions: async (roomId) => {
+    if (isValidating) return
+    isValidating = true
+    try {
+      const snap = await dbGet(ref(db, `rooms/${roomId}`))
       const data = snap.val()
       if (!data) return
 
@@ -226,63 +233,64 @@ export const useMatchStore = create((set, get) => ({
       const SYNC_WINDOW = 5000
       const timerRunning = !!(data.timer?.running)
 
-      dbGet(ref(db, `rooms/${roomId}/submissions`)).then(subSnap => {
-        const subsRaw = subSnap.val() || {}
-        const subs = Object.entries(subsRaw).map(([key, v]) => ({ key, ...v }))
-        if (!subs.length) return
+      const subSnap = await dbGet(ref(db, `rooms/${roomId}/submissions`))
+      const subsRaw = subSnap.val() || {}
+      const subs = Object.entries(subsRaw).map(([key, v]) => ({ key, ...v }))
+      if (!subs.length) return
 
-        const groups = {}
-        subs.forEach(s => {
-          if (!s.player || !s.action || typeof s.points === 'undefined' || !s.refereeId) return
-          const gKey = `${s.player}__${s.points}__${s.action}`
-          groups[gKey] = groups[gKey] || []
-          groups[gKey].push(s)
-        })
+      const groups = {}
+      subs.forEach(s => {
+        if (!s.player || !s.action || typeof s.points === 'undefined' || !s.refereeId) return
+        const gKey = `${s.player}__${s.points}__${s.action}`
+        groups[gKey] = groups[gKey] || []
+        groups[gKey].push(s)
+      })
 
-        const toRemove = new Set()
+      const toRemove = new Set()
 
-        Object.entries(groups).forEach(([, groupSubs]) => {
-          groupSubs.sort((a, b) => a.timestamp - b.timestamp)
-          const earliest = groupSubs[0]
+      Object.entries(groups).forEach(([, groupSubs]) => {
+        groupSubs.sort((a, b) => a.timestamp - b.timestamp)
+        const earliest = groupSubs[0]
 
-          const sampleRefName = data.referees?.[earliest.refereeId]?.name || earliest.refereeId || ''
+        const sampleRefName = data.referees?.[earliest.refereeId]?.name || earliest.refereeId || ''
 
-          {
-            const actionTeam = earliest.player === 'red' ? 'hong' : 'chong'
-            dbUpdate(ref(db, `rooms/${roomId}/lastAction/${actionTeam}`), {
-              image: getActionImageUrl(earliest.action, earliest.points),
-              refereeName: sampleRefName, timestamp: Date.now(), sourceTeam: earliest.player
-            }).catch(console.error)
-          }
+        const actionTeam = earliest.player === 'red' ? 'hong' : 'chong'
+        dbUpdate(ref(db, `rooms/${roomId}/lastAction/${actionTeam}`), {
+          image: getActionImageUrl(earliest.action, earliest.points),
+          refereeName: sampleRefName, timestamp: Date.now(), sourceTeam: earliest.player
+        }).catch(console.error)
 
-          if (!timerRunning) return
+        if (!timerRunning) return
 
-          const uniq = [...new Set(groupSubs.map(s => s.refereeId))]
-          const spread = groupSubs[groupSubs.length - 1].timestamp - groupSubs[0].timestamp
-          let shouldAward = false
-          if (refCount <= 1) shouldAward = uniq.length >= 1
-          else if (refCount === 2) shouldAward = uniq.length === 2 && spread <= SYNC_WINDOW
-          else shouldAward = uniq.length >= 2 && spread <= SYNC_WINDOW
+        const uniq = [...new Set(groupSubs.map(s => s.refereeId))]
+        const spread = groupSubs[groupSubs.length - 1].timestamp - groupSubs[0].timestamp
+        let shouldAward = false
+        if (refCount <= 1) shouldAward = uniq.length >= 1
+        else if (refCount === 2) shouldAward = uniq.length === 2 && spread <= SYNC_WINDOW
+        else shouldAward = uniq.length >= 2 && spread <= SYNC_WINDOW
 
-          if (shouldAward) {
-            const voters = [...new Set(groupSubs.map(s => s.refereeId))].map(id => ({
-              refereeId: id,
-              refereeName: data.referees?.[id]?.name || groupSubs.find(s => s.refereeId === id)?.refereeName || id,
-            }))
-            get().awardPoints(earliest.player, earliest.points, earliest.action, voters)
-            groupSubs.forEach(s => toRemove.add(s.key))
-          }
-        })
+        if (shouldAward) {
+          const voters = [...new Set(groupSubs.map(s => s.refereeId))].map(id => ({
+            refereeId: id,
+            refereeName: data.referees?.[id]?.name || groupSubs.find(s => s.refereeId === id)?.refereeName || id,
+          }))
+          get().awardPoints(earliest.player, earliest.points, earliest.action, voters)
+          groupSubs.forEach(s => toRemove.add(s.key))
+        }
+      })
 
-        toRemove.forEach(k => remove(ref(db, `rooms/${roomId}/submissions/${k}`)).catch(console.error))
+      toRemove.forEach(k => remove(ref(db, `rooms/${roomId}/submissions/${k}`)).catch(console.error))
 
-        subs.forEach(s => {
-          if (now - s.timestamp > SYNC_WINDOW * 2) {
-            remove(ref(db, `rooms/${roomId}/submissions/${s.key}`)).catch(console.error)
-          }
-        })
-      }).catch(console.error)
-    }).catch(console.error)
+      subs.forEach(s => {
+        if (now - s.timestamp > SYNC_WINDOW * 2) {
+          remove(ref(db, `rooms/${roomId}/submissions/${s.key}`)).catch(console.error)
+        }
+      })
+    } catch (err) {
+      console.error('validateSubmissions error:', err)
+    } finally {
+      isValidating = false
+    }
   },
 
   awardPoints: (player, points, action = 'score', voters = []) => {

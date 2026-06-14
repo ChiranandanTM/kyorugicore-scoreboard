@@ -14,6 +14,7 @@ export default function ScoreboardPage() {
   const store = useMatchStore()
   const roomListenerRef = useRef(null)
   const refListenerRef = useRef(null)
+  const subsListenerRef = useRef(null)
 
   // Set up Firebase listeners whenever room changes
   useEffect(() => {
@@ -23,12 +24,12 @@ export default function ScoreboardPage() {
     // Clean up old listeners
     if (roomListenerRef.current) off(roomListenerRef.current)
     if (refListenerRef.current) off(refListenerRef.current)
+    if (subsListenerRef.current) off(subsListenerRef.current)
 
-    // Room data listener
+    // Room data listener — sync display state only, no validation here
     roomListenerRef.current = ref(db, `rooms/${currentRoomId}`)
     onValue(roomListenerRef.current, (snapshot) => {
       store.syncFromFirebase(snapshot.val())
-      store.validateSubmissions(currentRoomId)
     }, (err) => console.error('Room listener error:', err))
 
     // Referees listener
@@ -37,9 +38,18 @@ export default function ScoreboardPage() {
       store.syncReferees(snapshot.val())
     })
 
+    // Submissions-only listener — only fires when referees submit, not on every room change
+    subsListenerRef.current = ref(db, `rooms/${currentRoomId}/submissions`)
+    onValue(subsListenerRef.current, (snapshot) => {
+      if (snapshot.exists()) {
+        store.validateSubmissions(currentRoomId)
+      }
+    })
+
     return () => {
       if (roomListenerRef.current) off(roomListenerRef.current)
       if (refListenerRef.current) off(refListenerRef.current)
+      if (subsListenerRef.current) off(subsListenerRef.current)
     }
   }, [store.currentRoomId])
 
