@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import {
   ref, set as dbSet, update as dbUpdate,
-  onValue, off, get as dbGet, remove, push
+  onValue, off, get as dbGet, remove, push, runTransaction
 } from 'firebase/database'
 import { db } from '../firebase'
 
@@ -246,8 +246,8 @@ export const useMatchStore = create((set, get) => ({
         groups[gKey].push(s)
       })
 
-      const toRemove = new Set()
       const toAward = []
+      const staleKeys = []
 
       Object.entries(groups).forEach(([, groupSubs]) => {
         groupSubs.sort((a, b) => a.timestamp - b.timestamp)
@@ -260,6 +260,8 @@ export const useMatchStore = create((set, get) => ({
           image: getActionImageUrl(earliest.action, earliest.points),
           refereeName: sampleRefName, timestamp: Date.now(), sourceTeam: earliest.player
         }).catch(console.error)
+
+        groupSubs.forEach(s => { if (now - s.timestamp > SYNC_WINDOW * 2) staleKeys.push(s.key) })
 
         if (!timerRunning) return
 
@@ -275,29 +277,42 @@ export const useMatchStore = create((set, get) => ({
             refereeId: id,
             refereeName: data.referees?.[id]?.name || groupSubs.find(s => s.refereeId === id)?.refereeName || id,
           }))
-          // Remove ALL submissions in this group (including any 3rd referee's submission)
-          groupSubs.forEach(s => toRemove.add(s.key))
-          toAward.push({ player: earliest.player, points: earliest.points, action: earliest.action, voters })
+          toAward.push({
+            player: earliest.player,
+            points: earliest.points,
+            action: earliest.action,
+            voters,
+            allKeys: groupSubs.map(s => s.key),
+            sentinelKey: earliest.key,
+          })
         }
       })
 
-      // Delete submissions FIRST and await completion before releasing the lock.
-      // This prevents the 3rd referee's late submission from triggering a second award
-      // while Ref1+Ref2 submissions are still being deleted from Firebase.
-      await Promise.all([...toRemove].map(k =>
-        remove(ref(db, `rooms/${roomId}/submissions/${k}`)).catch(console.error)
-      ))
-
-      // Award points only after submissions are confirmed deleted
-      toAward.forEach(({ player, points, action, voters }) => {
-        get().awardPoints(player, points, action, voters)
-      })
+      // Use a Firebase transaction to atomically claim each group's submissions.
+      // If two clients (scoreboard + referee lead device) both try to award the same
+      // group, only the one that wins the transaction proceeds — the other sees the
+      // submissions already deleted and aborts without awarding.
+      for (const award of toAward) {
+        try {
+          const result = await runTransaction(ref(db, `rooms/${roomId}/submissions`), (currentSubs) => {
+            if (!currentSubs) return currentSubs
+            // If sentinel key is gone, another client already claimed this group — abort
+            if (currentSubs[award.sentinelKey] === undefined) return undefined
+            // Atomically delete ALL submissions for this group (including extra refs)
+            award.allKeys.forEach(k => { delete currentSubs[k] })
+            return currentSubs
+          })
+          if (result.committed) {
+            get().awardPoints(award.player, award.points, award.action, award.voters)
+          }
+        } catch (err) {
+          console.error('Submission claim transaction error:', err)
+        }
+      }
 
       // Clean up stale submissions
       await Promise.all(
-        subs
-          .filter(s => now - s.timestamp > SYNC_WINDOW * 2)
-          .map(s => remove(ref(db, `rooms/${roomId}/submissions/${s.key}`)).catch(console.error))
+        staleKeys.map(k => remove(ref(db, `rooms/${roomId}/submissions/${k}`)).catch(console.error))
       )
     } catch (err) {
       console.error('validateSubmissions error:', err)
