@@ -407,6 +407,30 @@ html, body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+.match-history-button {
+  position: absolute;
+  top: 65px;
+  right: 10px;
+  padding: 12px 20px;
+  background-color: #17a2b8;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  width: 180px;
+  text-align: center;
+  z-index: 1001;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+  font-size: 16px;
+}
+
+.match-history-button:hover {
+  background-color: #138496;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 .reset-room-button {
   position: absolute;
   top: 120px;

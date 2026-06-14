@@ -42,6 +42,15 @@ export default function CentralTimer() {
         <div className="court-number">{courtDisplay}</div>
       )}
 
+      {store.matchWinnerDeclared && (
+        <div style={{
+          fontSize: 36, fontWeight: 'bold', color: '#c0392b',
+          letterSpacing: 2, textTransform: 'uppercase', margin: '4px 0'
+        }}>
+          Ended
+        </div>
+      )}
+
       <div className="rounds-completed">
         Round <span>{store.currentRound}</span> of 3
       </div>

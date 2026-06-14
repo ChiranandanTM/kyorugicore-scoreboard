@@ -29,7 +29,7 @@ export default function ScoringUI({ roomId, refereeId, refereeName, onLeave }) {
     push(ref(db, `rooms/${roomId}/submissions`), {
       player: team,
       points,
-      action: 'score',
+      action: actionType,
       refereeId,
       refereeName: currentName,
       image: imgUrl,

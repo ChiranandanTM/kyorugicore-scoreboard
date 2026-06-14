@@ -2,16 +2,84 @@ import { useEffect, useRef } from 'react'
 import headGearImg from '../../assets/images/head-gear.png'
 import bodyProtectorImg from '../../assets/images/body-protector.png'
 import fistImg from '../../assets/images/fist.png'
+import turnImg from '../../assets/images/turn.png'
+import spinningImg from '../../assets/images/spinning.png'
 
 function actionImage(action) {
-  if (action === 'head-click' || action === 'head-swipe') return headGearImg
-  if (action === 'body-click' || action === 'body-swipe') return bodyProtectorImg
-  if (action === 'punch-click') return fistImg
+  if (action === 'head-click' || action === 'head') return headGearImg
+  if (action === 'head-swipe')                      return spinningImg
+  if (action === 'body-click' || action === 'body') return bodyProtectorImg
+  if (action === 'body-swipe')                      return turnImg
+  if (action === 'punch-click' || action === 'punch') return fistImg
   return null
+}
+
+const KNOWN_ACTIONS = new Set(['punch','punch-click','body','body-click','body-swipe','head','head-click','head-swipe','gamjeom'])
+
+const TECH_COLS = [
+  { key: 'punch',    label: 'Punch',    img: fistImg,          actions: ['punch','punch-click'],   pts: [1] },
+  { key: 'trunk',    label: 'Trunk',    img: bodyProtectorImg, actions: ['body','body-click'],     pts: [2] },
+  { key: 'turn',     label: 'Turn',     img: turnImg,          actions: ['body-swipe'],            pts: [4] },
+  { key: 'head',     label: 'Head',     img: headGearImg,      actions: ['head','head-click'],     pts: [3] },
+  { key: 'spinning', label: 'Spinning', img: spinningImg,      actions: ['head-swipe'],            pts: [5] },
+]
+
+function countFor(entries, col) {
+  return entries.filter(e => {
+    if (col.actions.includes(e.action)) return true
+    if (!KNOWN_ACTIONS.has(e.action)) return col.pts.includes(e.points)
+    return false
+  }).length
+}
+
+function TechTable({ matchLog, playerKey, currentRound }) {
+  const myLog = matchLog.filter(e => e.player === playerKey)
+  const rounds = Array.from({ length: currentRound }, (_, i) => i + 1)
+
+  const tdStyle = { padding: '5px 6px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)' }
+  const thStyle = { padding: '4px 6px', textAlign: 'center', borderBottom: '2px solid rgba(255,255,255,0.2)' }
+
+  return (
+    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, color: '#fff' }}>
+      <thead>
+        <tr style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <th style={{ ...thStyle, textAlign: 'left', paddingLeft: 10 }}>R #</th>
+          {TECH_COLS.map(col => (
+            <th key={col.key} style={thStyle}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                <img src={col.img} alt={col.label} style={{ width: 22, height: 22, objectFit: 'contain', filter: 'brightness(1.2)' }} />
+                <span style={{ fontSize: 10, opacity: 0.85 }}>{col.label}</span>
+              </div>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rounds.map(r => {
+          const re = myLog.filter(e => e.round === r)
+          return (
+            <tr key={r} style={{ background: r % 2 === 0 ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.15)' }}>
+              <td style={{ ...tdStyle, textAlign: 'left', paddingLeft: 10, fontWeight: 'bold' }}>Round {r}</td>
+              {TECH_COLS.map(col => (
+                <td key={col.key} style={tdStyle}>{countFor(re, col)}</td>
+              ))}
+            </tr>
+          )
+        })}
+        <tr style={{ background: 'rgba(0,0,0,0.5)', fontWeight: 'bold' }}>
+          <td style={{ ...tdStyle, textAlign: 'left', paddingLeft: 10 }}>Total</td>
+          {TECH_COLS.map(col => (
+            <td key={col.key} style={tdStyle}>{countFor(myLog, col)}</td>
+          ))}
+        </tr>
+      </tbody>
+    </table>
+  )
 }
 
 export default function TeamPanel({
   team, side, score, gamJeom, blinkClass, lastAction, lastPressedAction, disabled,
+  matchWinnerDeclared, matchLog, currentRound,
   onAddPoints, onRemovePoints, onDeclareRoundWinner, onDeclareMatchWinner,
   onMedicalTimeout, onAddGamJeom, onSubtractGamJeom
 }) {
@@ -69,8 +137,10 @@ export default function TeamPanel({
     }, 800)
   }, [lastAction])
 
+  const playerKey = isHong ? 'red' : 'blue'
+
   return (
-    <div className={containerClass}>
+    <div className={containerClass} style={{ position: 'relative' }}>
       <div className={teamClass}>
         <h1>{isHong ? 'Hong' : 'Chong'}</h1>
         <div className={`score ${blinkClass}`}>{score}</div>
@@ -108,6 +178,15 @@ export default function TeamPanel({
           />
         </div>
       </div>
+
+      {matchWinnerDeclared && matchLog && (
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(4px)',
+        }}>
+          <TechTable matchLog={matchLog} playerKey={playerKey} currentRound={currentRound || 1} />
+        </div>
+      )}
     </div>
   )
 }

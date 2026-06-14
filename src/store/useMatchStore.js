@@ -19,6 +19,23 @@ let timerInterval = null
 let breakInterval = null
 let currentlyPlaying = null
 
+function getActionImageUrl(action, points) {
+  switch (action) {
+    case 'head':        case 'head-click':  return '/assets/images/head-gear.png'
+    case 'head-swipe':                      return '/assets/images/spinning.png'
+    case 'body':        case 'body-click':  return '/assets/images/body-protector.png'
+    case 'body-swipe':                      return '/assets/images/turn.png'
+    case 'punch':       case 'punch-click': return '/assets/images/fist.png'
+    default:
+      if (points === 5) return '/assets/images/spinning.png'
+      if (points === 4) return '/assets/images/turn.png'
+      if (points === 3) return '/assets/images/head-gear.png'
+      if (points === 2) return '/assets/images/body-protector.png'
+      if (points === 1) return '/assets/images/fist.png'
+      return ''
+  }
+}
+
 export function playSound(soundId) {
   if (currentlyPlaying) {
     const old = document.getElementById(currentlyPlaying)
@@ -77,6 +94,10 @@ export const useMatchStore = create((set, get) => ({
   isBreakRunning: false,
   overtimeSeconds: 0,
   isOvertime: false,
+
+  // Match history log (persists until New Match)
+  matchLog: [],
+  matchHistoryOpen: false,
 
   // ── Room ────────────────────────────────────────────────────────
   createRoom: () => {
@@ -145,6 +166,9 @@ export const useMatchStore = create((set, get) => ({
     const newHongPressed = data.lastPressedAction?.hong ?? state.hongLastPressedAction
     const newChongPressed = data.lastPressedAction?.chong ?? state.chongLastPressedAction
     const newRoundStats = data.roundStats ?? state.roundStats
+    const newMatchLog = data.currentMatchLog
+      ? Object.values(data.currentMatchLog).sort((a, b) => a.timestamp - b.timestamp)
+      : state.matchLog
 
     set({
       hongScore: newHong,
@@ -162,6 +186,7 @@ export const useMatchStore = create((set, get) => ({
       hongLastPressedAction: newHongPressed,
       chongLastPressedAction: newChongPressed,
       roundStats: newRoundStats,
+      matchLog: newMatchLog,
     })
 
     // Sync timer running state across clients
@@ -219,13 +244,14 @@ export const useMatchStore = create((set, get) => ({
         Object.entries(groups).forEach(([, groupSubs]) => {
           groupSubs.sort((a, b) => a.timestamp - b.timestamp)
           const earliest = groupSubs[0]
-          const sampleImage = earliest.image || ''
+
           const sampleRefName = data.referees?.[earliest.refereeId]?.name || earliest.refereeId || ''
 
-          if (earliest.action === 'score') {
+          {
             const actionTeam = earliest.player === 'red' ? 'hong' : 'chong'
             dbUpdate(ref(db, `rooms/${roomId}/lastAction/${actionTeam}`), {
-              image: sampleImage, refereeName: sampleRefName, timestamp: Date.now(), sourceTeam: earliest.player
+              image: getActionImageUrl(earliest.action, earliest.points),
+              refereeName: sampleRefName, timestamp: Date.now(), sourceTeam: earliest.player
             }).catch(console.error)
           }
 
@@ -239,7 +265,11 @@ export const useMatchStore = create((set, get) => ({
           else shouldAward = uniq.length >= 2 && spread <= SYNC_WINDOW
 
           if (shouldAward) {
-            get().awardPoints(earliest.player, earliest.points)
+            const voters = [...new Set(groupSubs.map(s => s.refereeId))].map(id => ({
+              refereeId: id,
+              refereeName: data.referees?.[id]?.name || groupSubs.find(s => s.refereeId === id)?.refereeName || id,
+            }))
+            get().awardPoints(earliest.player, earliest.points, earliest.action, voters)
             groupSubs.forEach(s => toRemove.add(s.key))
           }
         })
@@ -255,8 +285,8 @@ export const useMatchStore = create((set, get) => ({
     }).catch(console.error)
   },
 
-  awardPoints: (player, points) => {
-    const { hongScore, chongScore, hongGamJeom, chongGamJeom, currentRoomId, roundStats } = get()
+  awardPoints: (player, points, action = 'score', voters = []) => {
+    const { hongScore, chongScore, hongGamJeom, chongGamJeom, currentRoomId, roundStats, currentRound, matchLog } = get()
     const newHong = player === 'red' ? hongScore + points : hongScore
     const newChong = player === 'blue' ? chongScore + points : chongScore
 
@@ -267,13 +297,17 @@ export const useMatchStore = create((set, get) => ({
     }
     newStats[teamKey].byPoints[points] = (newStats[teamKey].byPoints[points] || 0) + 1
 
-    set({ hongScore: newHong, chongScore: newChong, roundStats: newStats })
+    const logEntry = { timestamp: Date.now(), player, points, action, voters, round: currentRound }
+    const newMatchLog = [...matchLog, logEntry]
+
+    set({ hongScore: newHong, chongScore: newChong, roundStats: newStats, matchLog: newMatchLog })
     if (currentRoomId) {
       dbUpdate(ref(db, `rooms/${currentRoomId}`), {
         teamA: { score: newHong, gamJeoms: hongGamJeom },
         teamB: { score: newChong, gamJeoms: chongGamJeom },
         roundStats: newStats,
       }).catch(console.error)
+      push(ref(db, `rooms/${currentRoomId}/currentMatchLog`), logEntry).catch(console.error)
     }
     get().checkPointGap()
     get().checkGamJeomLimit()
@@ -575,10 +609,12 @@ export const useMatchStore = create((set, get) => ({
       if (breakInterval) { clearInterval(breakInterval); breakInterval = null }
       const newTime = defaultSettings.roundMinutes * 60 + defaultSettings.roundSeconds
       set({ timerTime: newTime, timerSetTime: newTime, roundDeclared: false, isBreakRunning: false, isOvertime: false, overtimeSeconds: 0, breakTimeRemaining: 0 })
+      playSound('startSound')
+      get()._startTimerTick()
       if (currentRoomId) {
         dbUpdate(ref(db, `rooms/${currentRoomId}`), {
           roundDeclared: false,
-          timer: { minutes: Math.floor(newTime / 60), seconds: newTime % 60, running: false }
+          timer: { minutes: Math.floor(newTime / 60), seconds: newTime % 60, running: true }
         }).catch(console.error)
       }
       return
@@ -722,6 +758,8 @@ export const useMatchStore = create((set, get) => ({
       isBreakRunning: false, isOvertime: false, overtimeSeconds: 0, breakTimeRemaining: 0,
       roundStats: { hong: { byPoints: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } }, chong: { byPoints: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } } },
       superiorityModalOpen: false,
+      matchLog: [],
+      matchHistoryOpen: false,
     })
 
     if (currentRoomId) {
@@ -730,7 +768,8 @@ export const useMatchStore = create((set, get) => ({
         timer: { minutes: defaultSettings.roundMinutes, seconds: defaultSettings.roundSeconds, running: false },
         round: 1, hongRoundsWon: 0, chongRoundsWon: 0,
         medicalTimeout: { active: false, team: '' },
-        redBlinkClass: '', blueBlinkClass: '', submissions: {}
+        redBlinkClass: '', blueBlinkClass: '', submissions: {},
+        currentMatchLog: null,
       }).catch(console.error)
     }
   },
@@ -748,4 +787,6 @@ export const useMatchStore = create((set, get) => ({
 
   // UI toggles
   toggleRefereeLogin: (show) => set({ refereeLoginOpen: show }),
+  openMatchHistory: () => set({ matchHistoryOpen: true }),
+  closeMatchHistory: () => set({ matchHistoryOpen: false }),
 }))

@@ -8,6 +8,7 @@ import PointSlideModal from '../components/scoreboard/PointSlideModal'
 import SettingsModal from '../components/scoreboard/SettingsModal'
 import RefereeLoginModal from '../components/scoreboard/RefereeLoginModal'
 import SuperiorityModal from '../components/scoreboard/SuperiorityModal'
+import MatchHistoryModal from '../components/scoreboard/MatchHistoryModal'
 
 export default function ScoreboardPage() {
   const store = useMatchStore()
@@ -75,6 +76,9 @@ export default function ScoreboardPage() {
           lastAction={store.hongLastAction}
           lastPressedAction={store.hongLastPressedAction}
           disabled={buttonsDisabled}
+          matchWinnerDeclared={store.matchWinnerDeclared}
+          matchLog={store.matchLog}
+          currentRound={store.currentRound}
           onAddPoints={() => store.openPointSlide('add', 'red')}
           onRemovePoints={() => store.openPointSlide('subtract', 'red')}
           onDeclareRoundWinner={() => store.declareRoundWinner('hong')}
@@ -97,6 +101,9 @@ export default function ScoreboardPage() {
           lastAction={store.chongLastAction}
           lastPressedAction={store.chongLastPressedAction}
           disabled={buttonsDisabled}
+          matchWinnerDeclared={store.matchWinnerDeclared}
+          matchLog={store.matchLog}
+          currentRound={store.currentRound}
           onAddPoints={() => store.openPointSlide('add', 'blue')}
           onRemovePoints={() => store.openPointSlide('subtract', 'blue')}
           onDeclareRoundWinner={() => store.declareRoundWinner('chong')}
@@ -124,6 +131,12 @@ export default function ScoreboardPage() {
         >
           Reset Room Score
         </button>
+        <button
+          className="match-history-button"
+          onClick={store.openMatchHistory}
+        >
+          Match History
+        </button>
 
         <div id="redTimeout" className="timeout-message" />
         <div id="blueTimeout" className="timeout-message" />
@@ -131,6 +144,7 @@ export default function ScoreboardPage() {
         {store.pointSlideOpen && <PointSlideModal />}
         {store.settingsOpen && <SettingsModal />}
         {store.superiorityModalOpen && <SuperiorityModal />}
+        {store.matchHistoryOpen && <MatchHistoryModal />}
       </div>
     </>
   )

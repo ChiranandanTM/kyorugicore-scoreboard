@@ -5,10 +5,10 @@ import ScoringUI from '../components/referee/ScoringUI'
 export default function RefereePage() {
   const [sessionRoom, setSessionRoom] = useState(() => sessionStorage.getItem('currentRoomId') || null)
   const [refereeId] = useState(() => {
-    let id = localStorage.getItem('refereeId')
+    let id = sessionStorage.getItem('refereeId')
     if (!id) {
       id = 'referee_' + Math.random().toString(36).substr(2, 9)
-      localStorage.setItem('refereeId', id)
+      sessionStorage.setItem('refereeId', id)
     }
     return id
   })
