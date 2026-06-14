@@ -134,7 +134,7 @@ export default function TeamPanel({
     hideTimerRef.current = setTimeout(() => {
       if (imgRef.current) imgRef.current.style.display = 'none'
       if (nameRef.current) nameRef.current.style.display = 'none'
-    }, 2000)
+    }, 1000)
   }, [lastAction])
   
   const playerKey = isHong ? 'red' : 'blue'
