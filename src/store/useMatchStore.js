@@ -247,6 +247,7 @@ export const useMatchStore = create((set, get) => ({
       })
 
       const toRemove = new Set()
+      const toAward = []
 
       Object.entries(groups).forEach(([, groupSubs]) => {
         groupSubs.sort((a, b) => a.timestamp - b.timestamp)
@@ -274,18 +275,30 @@ export const useMatchStore = create((set, get) => ({
             refereeId: id,
             refereeName: data.referees?.[id]?.name || groupSubs.find(s => s.refereeId === id)?.refereeName || id,
           }))
-          get().awardPoints(earliest.player, earliest.points, earliest.action, voters)
+          // Remove ALL submissions in this group (including any 3rd referee's submission)
           groupSubs.forEach(s => toRemove.add(s.key))
+          toAward.push({ player: earliest.player, points: earliest.points, action: earliest.action, voters })
         }
       })
 
-      toRemove.forEach(k => remove(ref(db, `rooms/${roomId}/submissions/${k}`)).catch(console.error))
+      // Delete submissions FIRST and await completion before releasing the lock.
+      // This prevents the 3rd referee's late submission from triggering a second award
+      // while Ref1+Ref2 submissions are still being deleted from Firebase.
+      await Promise.all([...toRemove].map(k =>
+        remove(ref(db, `rooms/${roomId}/submissions/${k}`)).catch(console.error)
+      ))
 
-      subs.forEach(s => {
-        if (now - s.timestamp > SYNC_WINDOW * 2) {
-          remove(ref(db, `rooms/${roomId}/submissions/${s.key}`)).catch(console.error)
-        }
+      // Award points only after submissions are confirmed deleted
+      toAward.forEach(({ player, points, action, voters }) => {
+        get().awardPoints(player, points, action, voters)
       })
+
+      // Clean up stale submissions
+      await Promise.all(
+        subs
+          .filter(s => now - s.timestamp > SYNC_WINDOW * 2)
+          .map(s => remove(ref(db, `rooms/${roomId}/submissions/${s.key}`)).catch(console.error))
+      )
     } catch (err) {
       console.error('validateSubmissions error:', err)
     } finally {
