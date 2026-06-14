@@ -10,7 +10,8 @@ const DEFAULT_SETTINGS = {
   roundSeconds: 30,
   breakSeconds: 30,
   medicalTimeout: 60,
-  courtNumber: 'none'
+  courtNumber: 'none',
+  pointGap: 12,
 }
 
 // Module-level interval refs (not in Zustand to avoid spurious re-renders)
@@ -436,11 +437,12 @@ export const useMatchStore = create((set, get) => ({
   },
 
   checkPointGap: () => {
-    const { hongScore, chongScore, hongRoundsWon, chongRoundsWon, matchWinnerDeclared, roundDeclared } = get()
+    const { hongScore, chongScore, hongRoundsWon, chongRoundsWon, matchWinnerDeclared, roundDeclared, defaultSettings } = get()
     if (matchWinnerDeclared || roundDeclared) return
-    if (hongScore - chongScore >= 12 && hongRoundsWon < 2 && chongRoundsWon < 2) {
+    const gap = defaultSettings.pointGap ?? 12
+    if (hongScore - chongScore >= gap && hongRoundsWon < 2 && chongRoundsWon < 2) {
       get().stopTimer(); get().declareRoundWinner('hong')
-    } else if (chongScore - hongScore >= 12 && hongRoundsWon < 2 && chongRoundsWon < 2) {
+    } else if (chongScore - hongScore >= gap && hongRoundsWon < 2 && chongRoundsWon < 2) {
       get().stopTimer(); get().declareRoundWinner('chong')
     }
   },
@@ -542,7 +544,7 @@ export const useMatchStore = create((set, get) => ({
       const { timerTime, matchWinnerDeclared, isMedicalTimeout, roundDeclared, hongScore, chongScore } = get()
       if (timerTime > 0 && !matchWinnerDeclared && !isMedicalTimeout && !roundDeclared) {
         set({ timerTime: timerTime - 1 })
-        if (Math.abs(hongScore - chongScore) >= 12) {
+        if (Math.abs(hongScore - chongScore) >= (get().defaultSettings.pointGap ?? 12)) {
           get().stopTimer()
           get().declareRoundWinner(hongScore > chongScore ? 'hong' : 'chong')
         }
@@ -606,11 +608,15 @@ export const useMatchStore = create((set, get) => ({
   stopTimer: () => {
     if (timerInterval) {
       clearInterval(timerInterval); timerInterval = null
-      const { currentRoomId } = get()
+      const { currentRoomId, timerTime } = get()
       set({ isTimerRunning: false })
       playSound('stopSound')
       if (currentRoomId) {
-        dbUpdate(ref(db, `rooms/${currentRoomId}/timer`), { running: false }).catch(console.error)
+        dbUpdate(ref(db, `rooms/${currentRoomId}/timer`), {
+          running: false,
+          minutes: Math.floor(timerTime / 60),
+          seconds: timerTime % 60,
+        }).catch(console.error)
       }
     }
   },

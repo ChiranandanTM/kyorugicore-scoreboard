@@ -9,6 +9,7 @@ export default function SettingsModal() {
   const [breakSeconds, setBreakSeconds] = useState(defaultSettings.breakSeconds)
   const [medicalTimeout, setMedicalTimeout] = useState(defaultSettings.medicalTimeout)
   const [courtNumber, setCourtNumber] = useState(defaultSettings.courtNumber)
+  const [pointGap, setPointGap] = useState(defaultSettings.pointGap ?? 12)
 
   const clamp = (v, min, max) => Math.min(max, Math.max(min, parseInt(v) || 0))
 
@@ -19,6 +20,7 @@ export default function SettingsModal() {
       breakSeconds: clamp(breakSeconds, 0, 300),
       medicalTimeout: clamp(medicalTimeout, 0, 300),
       courtNumber,
+      pointGap: clamp(pointGap, 1, 99),
     })
   }
 
@@ -52,6 +54,12 @@ export default function SettingsModal() {
         <input
           type="number" min="0" max="300" value={medicalTimeout}
           onChange={e => setMedicalTimeout(e.target.value)}
+        />
+
+        <label>Point Gap (auto round win):</label>
+        <input
+          type="number" min="1" max="99" value={pointGap}
+          onChange={e => setPointGap(e.target.value)}
         />
 
         <label>Court Number:</label>
