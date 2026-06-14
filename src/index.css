@@ -53,15 +53,15 @@ html, body {
 }
 
 .team h1 {
-  font-size: 36px;
+  font-size: clamp(16px, 2.2vw, 38px);
   margin-bottom: 20px;
   position: absolute;
-  top: 20px;
+  top: 2vh;
   color: white;
 }
 
 .score {
-  font-size: 150px;
+  font-size: clamp(60px, 11vw, 200px);
   margin: 0;
   flex-grow: 1;
   display: flex;
@@ -72,16 +72,16 @@ html, body {
 }
 
 .team button {
-  margin: 5px 0;
-  font-size: 16px;
-  padding: 10px 20px;
+  margin: clamp(3px, 0.4vh, 7px) 0;
+  font-size: clamp(10px, 1.1vw, 16px);
+  padding: clamp(5px, 0.7vh, 11px) clamp(8px, 1.2vw, 20px);
   border: 1px solid #ccc;
   border-radius: 5px;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.85);
   color: #000;
   transition: all 0.2s ease;
-  width: 200px;
+  width: clamp(120px, 13vw, 210px);
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -103,10 +103,9 @@ html, body {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  padding: 15px 20px;
-  width: 90%;
-  max-width: 400px;
-  min-height: 400px;
+  padding: clamp(10px, 1.5vh, 20px) clamp(10px, 1.5vw, 22px);
+  width: clamp(200px, 22vw, 400px);
+  min-height: clamp(260px, 38vh, 460px);
   background-color: rgba(255, 255, 255, 0.85);
   border: 2px solid black;
   border-radius: 15px;
@@ -115,19 +114,19 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: clamp(4px, 0.7vh, 10px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .break-timer {
   position: absolute;
-  top: -60px;
+  top: -7vh;
   left: 50%;
   transform: translateX(-50%);
-  padding: 15px 30px;
+  padding: clamp(8px, 1.2vh, 16px) clamp(12px, 2vw, 32px);
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 12px;
-  font-size: 32px;
+  font-size: clamp(18px, 2.4vw, 36px);
   font-weight: bold;
   color: #fff;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -152,26 +151,26 @@ html, body {
 }
 
 #timerDisplay, .timer-display {
-  font-size: 48px;
+  font-size: clamp(24px, 3vw, 52px);
   font-weight: bold;
   font-family: 'Segoe UI', Arial, sans-serif;
   letter-spacing: 1px;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   background-color: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
-  width: 140px;
-  height: 140px;
+  width: clamp(90px, 10vw, 150px);
+  height: clamp(90px, 10vw, 150px);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin: 10px auto;
+  margin: clamp(4px, 0.8vh, 12px) auto;
   border: 2px solid #000;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 #roundsCompleted, .rounds-completed {
-  margin: 8px 0;
-  font-size: 42px;
+  margin: clamp(4px, 0.6vh, 10px) 0;
+  font-size: clamp(18px, 2.6vw, 42px);
   font-weight: bold;
   color: #000;
   font-family: 'Segoe UI', Arial, sans-serif;
@@ -180,8 +179,8 @@ html, body {
 }
 
 #playPauseButton, .play-pause-button {
-  width: 80px;
-  height: 80px;
+  width: clamp(48px, 5.5vw, 84px);
+  height: clamp(48px, 5.5vw, 84px);
   opacity: 0.85;
   border: none;
   background: none;
@@ -201,16 +200,16 @@ html, body {
 }
 
 #resetTimerButton, .reset-timer-button {
-  margin-top: 20px;
-  font-size: 16px;
-  padding: 10px 20px;
+  margin-top: clamp(8px, 1.2vh, 22px);
+  font-size: clamp(10px, 1.1vw, 16px);
+  padding: clamp(5px, 0.7vh, 11px) clamp(8px, 1.2vw, 20px);
   border: 1px solid #ccc;
   border-radius: 5px;
   cursor: pointer;
   background-color: #fff;
   color: #000;
   transition: background-color 0.2s ease;
-  width: 200px;
+  width: clamp(120px, 13vw, 210px);
   text-align: center;
 }
 
@@ -240,8 +239,8 @@ html, body {
 }
 
 .gamjeom-circle {
-  width: 80px;
-  height: 80px;
+  width: clamp(48px, 5.5vw, 86px);
+  height: clamp(48px, 5.5vw, 86px);
   background: linear-gradient(135deg, #ffffff33, #ffffff66);
   border-radius: 50%;
   display: flex;
@@ -270,7 +269,7 @@ html, body {
 }
 
 .gamjeom-fraction {
-  font-size: 24px;
+  font-size: clamp(13px, 1.5vw, 24px);
   font-weight: bold;
   color: #fff;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
@@ -279,16 +278,16 @@ html, body {
 
 .gamjeom-container-left button,
 .gamjeom-container-right button {
-  margin: 5px 0;
-  font-size: 16px;
-  padding: 10px 20px;
+  margin: clamp(3px, 0.4vh, 7px) 0;
+  font-size: clamp(10px, 1.1vw, 16px);
+  padding: clamp(5px, 0.7vh, 11px) clamp(6px, 1vw, 18px);
   border: 1px solid #ccc;
   border-radius: 5px;
   cursor: pointer;
   background-color: #fff;
   color: #000;
   transition: background-color 0.2s ease;
-  width: 150px;
+  width: clamp(100px, 11vw, 165px);
   text-align: center;
 }
 
@@ -363,15 +362,16 @@ html, body {
 /* Utility buttons */
 .reset-scores-button {
   position: absolute;
-  top: 70px;
-  left: 20px;
-  padding: 12px 20px;
+  top: 7vh;
+  left: 1.5vw;
+  padding: clamp(7px, 0.9vh, 13px) clamp(10px, 1.3vw, 22px);
   background-color: #dc3545;
   color: white;
   border-radius: 5px;
   border: none;
   cursor: pointer;
-  width: 180px;
+  width: clamp(120px, 12vw, 190px);
+  font-size: clamp(11px, 1.1vw, 16px);
   text-align: center;
   z-index: 1001;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -386,15 +386,16 @@ html, body {
 
 .new-match-button {
   position: absolute;
-  top: 20px;
-  left: 20px;
-  padding: 12px 20px;
+  top: 2vh;
+  left: 1.5vw;
+  padding: clamp(7px, 0.9vh, 13px) clamp(10px, 1.3vw, 22px);
   background-color: #28a745;
   color: white;
   border-radius: 5px;
   border: none;
   cursor: pointer;
-  width: 180px;
+  width: clamp(120px, 12vw, 190px);
+  font-size: clamp(11px, 1.1vw, 16px);
   text-align: center;
   z-index: 1001;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -409,20 +410,20 @@ html, body {
 
 .match-history-button {
   position: absolute;
-  top: 65px;
-  right: 10px;
-  padding: 12px 20px;
+  top: 7vh;
+  right: 1vw;
+  padding: clamp(7px, 0.9vh, 13px) clamp(10px, 1.3vw, 22px);
   background-color: #17a2b8;
   color: white;
   border-radius: 5px;
   border: none;
   cursor: pointer;
-  width: 180px;
+  width: clamp(120px, 12vw, 190px);
   text-align: center;
   z-index: 1001;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
-  font-size: 16px;
+  font-size: clamp(11px, 1.1vw, 16px);
 }
 
 .match-history-button:hover {
@@ -433,15 +434,16 @@ html, body {
 
 .reset-room-button {
   position: absolute;
-  top: 120px;
-  left: 20px;
-  padding: 12px 20px;
+  top: 13vh;
+  left: 1.5vw;
+  padding: clamp(7px, 0.9vh, 13px) clamp(10px, 1.3vw, 22px);
   background-color: #dc3545;
   color: white;
   border-radius: 5px;
   border: none;
   cursor: pointer;
-  width: 180px;
+  width: clamp(120px, 12vw, 190px);
+  font-size: clamp(11px, 1.1vw, 16px);
   text-align: center;
   z-index: 1001;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -456,16 +458,16 @@ html, body {
 
 .create-room-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 15px 30px;
+  top: 1vh;
+  right: 1vw;
+  padding: clamp(8px, 1.1vh, 16px) clamp(12px, 1.8vw, 30px);
   background-color: #fff;
   color: #000;
   border: 1px solid #ccc;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
-  font-size: 18px;
+  font-size: clamp(13px, 1.4vw, 20px);
   z-index: 1001;
 }
 
@@ -473,11 +475,11 @@ html, body {
 
 #editScoreboardButton, .edit-scoreboard-button {
   position: absolute;
-  top: 20px;
+  top: 1.5vh;
   left: 50%;
   transform: translateX(-50%);
-  padding: 12px 24px;
-  font-size: 18px;
+  padding: clamp(7px, 0.9vh, 13px) clamp(12px, 1.6vw, 26px);
+  font-size: clamp(12px, 1.3vw, 18px);
   font-weight: bold;
   border: none;
   border-radius: 10px;
