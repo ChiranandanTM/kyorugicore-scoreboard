@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { ref, set as dbSet, onValue, off } from 'firebase/database'
+import { ref, get, set as dbSet, runTransaction } from 'firebase/database'
 import { db } from '../../firebase'
 
 export default function RoomEntry({ refereeId, onJoined }) {
@@ -18,33 +18,60 @@ export default function RoomEntry({ refereeId, onJoined }) {
     }
   }, [])
 
-  const joinRoom = (code) => {
+  const joinRoom = async (code) => {
     const room = (code || roomCode).trim().toUpperCase()
     if (!room) { setError('Enter a room code'); return }
+    setError('')
 
-    dbSet(ref(db, `rooms/${room}/referees/${refereeId}`), {
-      connected: true,
-      name: `Referee ${Math.floor(Math.random() * 1000)}`,
-      lastActive: Date.now(),
-      joined: Date.now()
-    }).then(() => {
+    try {
+      const roomSnap = await get(ref(db, `rooms/${room}`))
+      if (!roomSnap.exists()) { setError('Invalid room code. Please try again.'); return }
+
+      const referees = roomSnap.val()?.referees || {}
+
+      // Already in room — rejoin with existing name
+      if (referees[refereeId]) {
+        const finalName = referees[refereeId].name
+        await dbSet(ref(db, `rooms/${room}/referees/${refereeId}`), {
+          ...referees[refereeId],
+          lastActive: Date.now(),
+        })
+        sessionStorage.setItem('isLoggedIn', 'true')
+        sessionStorage.setItem('currentRoomId', room)
+        onJoined(room, finalName)
+        return
+      }
+
+      if (Object.keys(referees).length >= 4) {
+        setError('Maximum of 4 referees allowed in this room.')
+        return
+      }
+
+      // Atomically claim next sequential referee number
+      const counterResult = await runTransaction(
+        ref(db, `rooms/${room}/refereeCounter`),
+        (current) => (current || 0) + 1,
+      )
+
+      if (!counterResult.committed) throw new Error('Failed to claim referee number')
+
+      const assignedNumber = counterResult.snapshot.val()
+      const finalName = `Referee ${assignedNumber}`
+
+      await dbSet(ref(db, `rooms/${room}/referees/${refereeId}`), {
+        joined: Date.now(),
+        lastActive: Date.now(),
+        name: finalName,
+        number: assignedNumber,
+      })
+
       sessionStorage.setItem('isLoggedIn', 'true')
       sessionStorage.setItem('currentRoomId', room)
-      sessionStorage.setItem('refereeId', refereeId)
-
-      // Listen for assigned name
-      const nameRef = ref(db, `rooms/${room}/referees/${refereeId}`)
-      const unsub = onValue(nameRef, (snap) => {
-        if (snap.exists()) {
-          const name = snap.val().name
-          off(nameRef)
-          onJoined(room, name)
-        }
-      })
-    }).catch(err => {
+      onJoined(room, finalName)
+    } catch (err) {
       console.error('Join failed:', err)
       setError('Failed to join room. Try again.')
-    })
+    }
   }
 
   const startScan = async () => {
