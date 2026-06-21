@@ -1,7 +1,25 @@
+import { useState, useEffect } from 'react'
 import { useMatchStore } from '../../store/useMatchStore'
 
 export default function CentralTimer() {
   const store = useMatchStore()
+  const [showResetWarning, setShowResetWarning] = useState(false)
+
+  // Clear warning once round is no longer declared (Reset Scores was pressed)
+  useEffect(() => {
+    if (!store.roundDeclared) setShowResetWarning(false)
+  }, [store.roundDeclared])
+
+  function handlePlayPause() {
+    if (store.roundDeclared && !store.matchWinnerDeclared) {
+      if (!showResetWarning) {
+        setShowResetWarning(true)
+        return
+      }
+      setShowResetWarning(false)
+    }
+    store.toggleTimer()
+  }
 
   const minutes = Math.floor(store.timerTime / 60).toString().padStart(2, '0')
   const seconds = (store.timerTime % 60).toString().padStart(2, '0')
@@ -60,7 +78,7 @@ export default function CentralTimer() {
       </div>
 
       <div className="timer-controls">
-        <button className="play-pause-button" onClick={store.toggleTimer}>
+        <button className="play-pause-button" onClick={handlePlayPause}>
           <img
             src={store.isTimerRunning ? '/assets/images/pause.svg' : '/assets/images/play.svg'}
             alt={store.isTimerRunning ? 'pause' : 'play'}
@@ -70,6 +88,17 @@ export default function CentralTimer() {
           Reset Timer
         </button>
       </div>
+
+      {showResetWarning && (
+        <div style={{
+          marginTop: 8, padding: '6px 12px', background: '#c0392b',
+          color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600,
+          textAlign: 'center', lineHeight: 1.4,
+        }}>
+          Press <strong>Reset Scores</strong> to start break time.<br />
+          Press Start again to skip to next round.
+        </div>
+      )}
 
       {(breakText || medicalText) && (
         <div

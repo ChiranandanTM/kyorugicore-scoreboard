@@ -648,6 +648,7 @@ export const useMatchStore = create((set, get) => ({
       playSound('startSound')
       get()._startTimerTick()
       if (currentRoomId) {
+        remove(ref(db, `rooms/${currentRoomId}/submissions`)).catch(console.error)
         dbUpdate(ref(db, `rooms/${currentRoomId}`), {
           roundDeclared: false,
           timer: { minutes: Math.floor(newTime / 60), seconds: newTime % 60, running: true }
@@ -670,6 +671,7 @@ export const useMatchStore = create((set, get) => ({
       get()._startTimerTick()
       const t = get().timerTime
       if (currentRoomId) {
+        remove(ref(db, `rooms/${currentRoomId}/submissions`)).catch(console.error)
         dbUpdate(ref(db, `rooms/${currentRoomId}/timer`), {
           running: true, minutes: Math.floor(t / 60), seconds: t % 60
         }).catch(console.error)
