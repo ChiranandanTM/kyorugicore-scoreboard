@@ -91,12 +91,33 @@ export default function CentralTimer() {
 
       {showResetWarning && (
         <div style={{
-          marginTop: 8, padding: '6px 12px', background: '#c0392b',
-          color: '#fff', borderRadius: 6, fontSize: 13, fontWeight: 600,
-          textAlign: 'center', lineHeight: 1.4,
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 3000,
         }}>
-          Press <strong>Reset Scores</strong> to start break time.<br />
-          Press Start again to skip to next round.
+          <div style={{
+            background: '#1a1a2e', border: '2px solid #ffd700', borderRadius: 14,
+            padding: '28px 36px', maxWidth: 360, textAlign: 'center', color: '#fff',
+          }}>
+            <div style={{ fontSize: 22, fontWeight: 'bold', marginBottom: 12, color: '#ffd700' }}>
+              Warning
+            </div>
+            <p style={{ fontSize: 15, marginBottom: 20, lineHeight: 1.6 }}>
+              Press <strong>Reset Scores</strong> to start the break time.
+              <br />
+              Press <strong>Start</strong> again to skip directly to the next round.
+            </p>
+            <button
+              onClick={() => setShowResetWarning(false)}
+              style={{
+                padding: '10px 28px', background: '#ffd700', color: '#1a1a2e',
+                border: 'none', borderRadius: 8, fontSize: 15, fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
 
